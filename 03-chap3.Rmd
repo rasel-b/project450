@@ -1,0 +1,43 @@
+# Simulation and analysis techniques {#simulation}
+
+## Simulation model and procedure  
+
+For this simulation study, we focus on the following two-level model, with one explanatory variable at level 1 (individual level) and one explanatory variable at level 2 (group level):
+\begin{equation} 
+\operatorname{logit}\left(p_{i j}\right)=\gamma_{00}+\gamma_{10} X_{i j}+\gamma_{01} Z_{j}+\gamma_{11} X_{i j} Z_{j}+u_{0 j}+u_{1 j} X_{i j}.
+\label{eqn:simulation_model}
+\end{equation}
+The accuracy of the estimates can be affected by the size of the intra-class correlation coefficient (ICC) [@goldstein2003]. Therefore, in our simulation, we have varied not only the sample size at the individual and group level but also the ICC.
+
+Following the simulation conditions used by @maas2005sufficient and @moineddin2007simulation, we set the following conditions for our simulation study:
+
+1. the number of groups (**$J$**) is set at $30$, $50$, and $100$,
+2. the number of individuals per group (**$n_{j}$**) is set at $5$, $30,$ and $50,$ and 
+3. the intra-class correlation coefficients $(\mathrm{ICC})$ is set at $0.1$, $0.2,$ and $0.3$.
+
+The number of groups is chosen so that the highest number should be sufficient. In practice, $50$ groups is a frequently occurring number in organizational and school research, and $30$ is the smallest acceptable number according to @maas2005sufficient. Similarly, the group sizes are chosen so that the highest number should be sufficient. A group size of $30$ is normal in educational research, and a group size of $5$ is normal in family research and longitudinal research. The three ICCs included in the study span the customary range of ICC found in social, behavioral, and education sciences [@gulliford1999components].
+
+The individual and group explanatory variables $X_{i j}$ and $Z_{j}$ are generated from the standard normal distribution. We set the fixed effect regression coefficients for all simulated models as follows: 
+$\gamma_{00}=-1.0$, $\gamma_{01}=0.3$, $\gamma_{10}=0.3$, and $\gamma_{11}=0.3$.
+The values of the fixed effect regression parameters do not change between models, while the variance $\sigma^2_{u0}$ varies according to the intraclass correlation coefficient, through the relation 
+\begin{equation}
+\sigma_{u0}^{2}=\frac{\frac{\pi^{2}}{3} \rho}{1-\rho}.
+\end{equation}
+That is, $\sigma_{u0}$ follows from the ICC and $\sigma^2_e$. The variance of the random slope, $\sigma^2_{u1}$, is set at 1 in all simulations. To simplify the simulation model, without loss of generality, the group random components $u_{0 j}$ and $u_{1 j}$ are assumed to be independent normal variables.
+
+Among the three most common approximation methods for maximum likelihood estimation in a multilevel logistic regression model, the Laplace approximation technique is used in this simulation study. The reason behind choosing Laplace approximation instead of adaptive Gaussian quadrature is as follows. The adaptive Gaussian quadrature (AGQ) method produces good approximation when the dimension of random effects is $1$, however, it starts giving worse results as the dimension of random effects increases. AGQ method is inaccurate if the dimension of random effects is greater than two. This is due to the limitation of the method in factorizing high-dimensional integrals into some integrals with low-dimension. Besides this, In a recent simulation study, @handayani2017comparative found that the Laplace approximation has the best performance (compared to AGQ and PQL) for obtaining maximum likelihood estimates in generalized linear mixed models in terms of their relative biases and mean square errors. Since in our simulation model the dimension of random effects is $2$, we decide to use the Laplace approximation technique. 
+
+There are $3\times3\times3=27$ conditions. For each condition, we generated $1,000$ simulated data sets. The **R** software (R version 3.6.0) is used for generating the simulated data sets and to estimate the model. Specifically, for the estimation we use the the `glmer()` function from the `lme4` package. The absolute value for parameter convergence criterion was set at $1e^{-7}$ and the maximum number of function evaluations was set at $20000$.
+
+
+## Analysis techniques
+
+### Percentage relative bias
+
+The accuracy of the parameter estimates (fixed effects coefficients and residual variances) is quantified by the percentage relative bias. Let $\hat{\theta}$ stand for the estimate of the population parameter $\theta$, then $\frac{\hat{\theta}-\theta}{\theta} \times 100$ indicates the percentage relative bias for parameter $\theta$.
+
+### Non-coverage rate of confidence interval
+
+The accuracy of the confidence interval is assessed by analyzing the observed non-coverage rate of the $95\%$ confidence interval. For each estimated parameter in each simulated dataset, we calculate a non-coverage indicator, which is equal to $0$ when the true value of that parameter lies inside the estimated $95\%$ confidence interval (CI) and $1$ when the true value lies outside this interval. Counting how many times the non-coverage indicator is equal to 1 in each simulation study, we can calculate the overall non-coverage rate and then compare it with the nominal rate of $5\%$. 
+
+

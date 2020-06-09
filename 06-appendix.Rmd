@@ -1,0 +1,234 @@
+`r if(knitr:::is_latex_output()) '\\appendix'`
+
+`r if(!knitr:::is_latex_output()) '# (APPENDIX) Appendix {-}'` 
+
+<!--
+If you feel it necessary to include an appendix, it goes here.
+-->
+
+
+# R codes used in this study
+\small
+```
+library(lme4)
+
+# Setting the parameters values
+g_00 <- -1
+g_01 <- 0.3
+g_10 <- 0.3
+g_11 <- 0.3
+
+s2_1 <- 1                   # Variance standardized to 1
+s01  <- 0                   # Covariance assumed zero
+s2_e <- (pi^2)/3            # Variance of the logistic distribution
+
+# Function for simulating data from two-level logistic regression model
+
+sim_fun <- function(J, n_j, ICC){
+  s2_0 <- s2_e / (1/ICC-1)  # Variance corresponding to specific ICC
+  
+  n_j <- rep(n_j, J)  # Number of individuals in jth group
+  N <- sum(n_j)       # Number of groups
+  
+  # Simulate the covariate values for this sample size.
+  
+  z <- rnorm(J)
+  x <- rnorm(N)
+  
+  # Generate (u_0j, u_1j) from a bivariate normal 
+  
+  mu <- c(0, 0)
+  sig <- matrix(c(s2_0, s01, s01, s2_1), ncol = 2)
+  u <- MASS::mvrnorm(J, mu = mu, Sigma = sig)
+  
+  # Now form the linear predictor.  First, the group-level predictor. 
+  # There are J of these.
+  
+  pi_0 <- g_00 + g_01*z + as.vector(u[,1])
+  pi_1 <- g_10 + g_11*z + as.vector(u[,2])
+  eta <- rep(pi_0, n_j) + rep(pi_1, n_j) * x
+  
+  # Transform back to the probability scale.
+  
+  p <- exp(eta) / (1+exp(eta))
+  
+  # Simulate a Bernoulli from each individual distribution.
+  
+  y <- rbinom(N, 1, p)
+  
+  sim_data <- data.frame(Y=y, X=x, Z=rep(z,n_j), group=rep(1:J,n_j))
+}
+# End of the function 'sim_fun'
+
+# Function for calculating percentage relative bias of the parameter estimates
+# and calculating non-coverage rates.
+
+analysis <- function(J, n_j, ICC) {
+  sim_dat <- sim_fun(J, n_j, ICC)
+  fit <- glmer(Y ~ X + Z + X:Z + (X||group), family=binomial, data=sim_dat,
+               control=glmerControl(optCtrl=list(maxfun=2e5)))
+  
+  s2_0 <- s2_e / (1/ICC-1)  ##variance corresponding to specific ICC
+  
+  true_val <- c(g_00, g_10, g_01, g_11, sqrt(s2_0), 1)
+  theta_hat <- c(as.numeric(fixef(fit)), as.data.frame(VarCorr(fit))[,5])
+  perc_rel_bias <- ((theta_hat-true_val)/true_val)*100
+  
+  ci_profile <- confint.merMod(object = fit, method = "profile", quiet = TRUE)
+  
+  nc_u0  <- ifelse (ci_profile[1] < sqrt(s2_0) & ci_profile[7]  > sqrt(s2_0), 0, 1)
+  nc_u1  <- ifelse (ci_profile[2] < sqrt(s2_1) & ci_profile[8]  > sqrt(s2_1), 0, 1)
+  nc_int <- ifelse (ci_profile[3] < g_00       & ci_profile[9]  > g_00,       0, 1)
+  nc_x   <- ifelse (ci_profile[4] < g_10       & ci_profile[10] > g_10,       0, 1)
+  nc_z   <- ifelse (ci_profile[5] < g_01       & ci_profile[11] > g_01,       0, 1)
+  nc_xz  <- ifelse (ci_profile[6] < g_11       & ci_profile[12] > g_11,       0, 1)
+  
+  noncoverage <- c(nc_int, nc_x, nc_z, nc_xz, nc_u0, nc_u1)
+  return (c(perc_rel_bias, noncoverage))
+}
+# End of the function 'analysis'
+
+# Combination 01:
+c01 <- replicate(1000, tryCatch(analysis(30, 5, 0.1), error=function(err) rep(NA,12)))
+r <- rowMeans(apply(c01, 2, unlist), na.rm = TRUE)
+perc_conv <- 1 - sum(is.na(c01[1,]))/1000
+
+# Combination 02:
+c02 <- replicate(1000, tryCatch(analysis(30, 5, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c02, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c02[1,]))/1000)
+
+# Combination 03:
+c03 <- replicate(1000, tryCatch(analysis(30, 5, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c03, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c03[1,]))/1000)
+
+# Combination 04:
+c04 <- replicate(1000, tryCatch(analysis(30, 30, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c04, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c04[1,]))/1000)
+
+# Combination 05:
+c05 <- replicate(1000, tryCatch(analysis(30, 30, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c05, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c05[1,]))/1000)
+
+# Combination 06:
+c06 <- replicate(1000, tryCatch(analysis(30, 30, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c06, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c06[1,]))/1000)
+
+# Combination 07:
+c07 <- replicate(1000, tryCatch(analysis(30, 50, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c07, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c07[1,]))/1000)
+
+# Combination 08:
+c08 <- replicate(1000, tryCatch(analysis(30, 50, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c08, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c08[1,]))/1000)
+
+# Combination 09:
+c09 <- replicate(1000, tryCatch(analysis(30, 50, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c09, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c09[1,]))/1000)
+
+# Combination 10:
+c10 <- replicate(1000, tryCatch(analysis(50, 5, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c10, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c10[1,]))/1000)
+
+# Combination 11:
+c11 <- replicate(1000, tryCatch(analysis(50, 5, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c11, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c11[1,]))/1000)
+
+# Combination 12:
+c12 <- replicate(1000, tryCatch(analysis(50, 5, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c12, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c12[1,]))/1000)
+
+# Combination 13:
+c13 <- replicate(1000, tryCatch(analysis(50, 30, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c13, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c13[1,]))/1000)
+
+# Combination 14:
+c14 <- replicate(1000, tryCatch(analysis(50, 30, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c14, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c14[1,]))/1000)
+
+# Combination 15:
+c15 <- replicate(1000, tryCatch(analysis(50, 30, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c15, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c15[1,]))/1000)
+
+# Combination 16:
+c16 <- replicate(1000, tryCatch(analysis(50, 50, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c16, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c16[1,]))/1000)
+
+# Combination 17:
+c17 <- replicate(1000, tryCatch(analysis(50, 50, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c17, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c17[1,]))/1000)
+
+# Combination 18:
+c18 <- replicate(1000, tryCatch(analysis(50, 50, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c18, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c18[1,]))/1000)
+
+# Combination 19:
+c19 <- replicate(1000, tryCatch(analysis(100, 5, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c19, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c19[1,]))/1000)
+
+# Combination 20:
+c20 <- replicate(1000, tryCatch(analysis(100, 5, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c20, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c20[1,]))/1000)
+
+# Combination 21:
+c21 <- replicate(1000, tryCatch(analysis(100, 5, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c21, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c21[1,]))/1000)
+
+# Combination 22:
+c22 <- replicate(1000, tryCatch(analysis(100, 30, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c22, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c22[1,]))/1000)
+
+# Combination 23:
+c23 <- replicate(1000, tryCatch(analysis(100, 30, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c23, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c23[1,]))/1000)
+
+# Combination 24:
+c24 <- replicate(1000, tryCatch(analysis(100, 30, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c24, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c24[1,]))/1000)
+
+# Combination 25:
+c25 <- replicate(1000, tryCatch(analysis(100, 50, 0.1), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c25, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c25[1,]))/1000)
+
+# Combination 26:
+c26 <- replicate(1000, tryCatch(analysis(100, 50, 0.2), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c26, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c26[1,]))/1000)
+
+# Combination 27:
+c27 <- replicate(1000, tryCatch(analysis(100, 50, 0.3), error=function(err) rep(NA,12)))
+r <- rbind(r, rowMeans(apply(c27, 2, unlist), na.rm = TRUE))
+perc_conv <- c(perc_conv, 1 - sum(is.na(c27[1,]))/1000)
+
+r[,1:6]        # Relative bias of the six estimates
+r[,7:12]       # Non-coverage rates of profile CI of the six estimates
+perc_conv*100  # Percentages of Convergence in the 27 conditions
+
+
+```
+<!--
+# The Second Appendix, for Fun
+-->

@@ -1,0 +1,214 @@
+# Methodology {#methodology}
+
+## Multilevel model
+
+Multilevel models (also known as hierarchical linear models, linear mixed-effects models, mixed models, nested data models, random coefficient, random-effects models, random parameter models, or split-plot designs) are statistical models of parameters that vary at more than one level [@raud2002]. Multilevel models are appropriate particularly for research designs where data for the individuals are organized at more than one level (i.e., nested data or grouped data). Multilevel models can be used on data with many levels, although two-level models are the most common. In a two-level model, the units of analysis are usually individuals (at a lower level) who are nested within contextual/aggregate units, sometimes called cluster or group (at a higher level). This project deals only with two-level models.
+
+## The multilevel linear regression model 
+
+Assume that we have data from J groups, with different numbers of individuals, $n_j$, in each group. Let, $Y_{i j}$ denote a continuous outcome variable on the $i^{th}$ individual in the $j^{th}$ group. Also, assume that we have one explanatory variable $X_{i j}$ on the individual level (level-1), and one explanatory variable $Z_j$ on the group-level (level-2).
+
+In order to model the data, we consider a two-level linear regression model with one explanatory variable at each level. The model is as follows:
+\begin{equation} 
+Y_{i j}=\beta_{0 j}+\beta_{1 j} X_{i j}+e_{i j},
+(\#eq:linear-model)
+\end{equation} 
+where $\beta_{0 j}$ is the group specific intercept, $\beta_{1 j}$ is the group specific effect of the individual level variable $X_{i j}$, and $e_{ij}$ are the individual level residuals.
+The variation of the group specific regression coefficients $\beta_{0 j}$ and $\beta_{1 j}$ are modeled as a function of group level (or higher level) variables as follows:
+\begin{equation} 
+\begin{array}{l}
+{\beta_{0 j}=\gamma_{00}+\gamma_{01} Z_{j}+u_{0 j}}, \\
+{\beta_{1 j}=\gamma_{10}+\gamma_{11} Z_{j}+u_{1 j}}, \\
+\end{array}
+(\#eq:beta)
+\end{equation}
+where $\gamma_{00}$ is the common intercept across groups, $\gamma_{01}$ is the effect of the group level predictor on the group-specific intercepts, $\gamma_{10}$ is the common slope associated with the individual level variable across groups, and $\gamma_{11}$ is the group level predictor on the group-specific slopes. The individual-level residuals $e_{ij}$ are assumed to have a normal distribution with mean zero and variance $\sigma^2_e$. The group-level residuals $u_{0j}$ and $u_{1j}$ are assumed to have a multivariate normal distribution with expectation zero, and to be independent from the residual errors $e_{ij}$. the variances of the residual errors $u_{0j}$ and $u_{1j}$ are specified as $\sigma_{u0}^{2}$ and $\sigma_{u1}^{2}$. That is,
+$$
+e_{ij} \sim N(0,\sigma^2_e),
+$$
+and
+$$
+\left[\begin{array}{l}{u_{0 j}} \\
+{u_{1 j}}\end{array}\right] \sim N\left(\left[\begin{array}{l}{0} \\
+{0}\end{array}\right],\left[\begin{array}{cc}{\sigma_{u0}^{2}} & {\sigma_{01}} \\ {\sigma_{01}} & {\sigma_{u1}^{2}}\end{array}\right]\right).
+$$
+This model can be written as one single regression model by substituting Equations \@ref(eq:beta) into the Equation \@ref(eq:linear-model). After substituting and rearranging terms the model becomes as follows:
+\begin{equation} 
+Y_{i j}=\gamma_{00}+\gamma_{10} X_{i j}+\gamma_{01} Z_{j}+\gamma_{11} X_{i j} Z_{j}+u_{0 j}+u_{1 j} X_{i j}+e_{i j}.
+(\#eq:linear-single)
+\end{equation}
+  
+## The multilevel logistic regression model
+      
+Let $Y_{i j}$ denote a binary outcome variable, coded 0 or 1, on the $i^{th}$ individual in the $j^{th}$ group. Also $p_{i j}$ be the probability that the outcome variable equals 1, i.e., $p_{i j}$ is the probability that the $i^{th}$ individual in $j^{th}$ group will experience the outcome. Here $Y_{i j}$ follows a Bernoulli distribution. Then in order to model the data, $p_{i j}$ is modeled using the link function, 'logit'.
+So for the binary outcome variable the model is as follows:
+\begin{equation} 
+{\operatorname{logit}\left(p_{i j}\right)=\pi_{0 j}+\pi_{1 j} X_{i j}}, \\
+(\#eq:logistic-model)
+\end{equation}
+where $\pi_{0 j}$ is the group specific intercept, and $\pi_{1 j}$ is the group specific effect of the individual level variable $X_{i j}$.
+The variation of the group specific regression coefficients are modeled as a function of group level (or higher level) variables as follows:
+\begin{equation} 
+\begin{array}{l}
+{\pi_{0 j}=\gamma_{00}+\gamma_{01} Z_{j}+u_{0 j}}, \\
+{\pi_{1 j}=\gamma_{10}+\gamma_{11} Z_{j}+u_{1 j}},
+\end{array}
+\end{equation}
+where
+$$
+\left[\begin{array}{l}{u_{0 j}} \\
+{u_{1 j}}\end{array}\right] \sim N\left(\left[\begin{array}{l}{0} \\
+{0}\end{array}\right],\left[\begin{array}{cc}{\sigma_{u0}^{2}} & {\sigma_{01}} \\ {\sigma_{01}} & {\sigma_{u1}^{2}}\end{array}\right]\right).
+$$
+
+The Model \@ref(eq:logistic-model) can be rewritten as the following single equation:
+\begin{equation} 
+\operatorname{logit}\left(p_{i j}\right)=\gamma_{00}+\gamma_{10} X_{i j}+\gamma_{01} Z_{j}+\gamma_{11} X_{i j} Z_{j}+u_{0 j}+u_{1 j} X_{i j}.
+(\#eq:logistic-single)
+\end{equation}
+  
+Equation \@ref(eq:logistic-single) consists of two parts. The segment $\gamma_{00}+\gamma_{10} X_{i j}+\gamma_{01} Z_{j}+\gamma_{11} X_{i j} Z_{j}$ contains all the fixed coefficients; it is called the fixed effect (or deterministic) part of the model. The segment $u_{0 j}+u_{1 j} X_{i j}$ is called the random (or stochastic) part of the model because it contains all the random error terms.
+Even if the analysis includes only the individual level variable, standard multivariate models are not appropriate for the grouped data since grouped data violate a crucial assumption of the independence of all observations. **Intra-class correlation (ICC)** is used as a mean to quantify the amount of dependence caused by grouping. ICC represents the proportion of the total observed individual variation in the outcome that can be explained by the grouping structure in the population. In other words, ICC = 0 indicates perfect independence of residuals: the observations do not depend on the group membership. On the contrary, ICC = 1 indicates perfect interdependence of residuals: the observations only vary between groups [@sommet2017keep]. When the ICC is not different from zero or negligible, one could consider running traditional one-level regression analysis rather than multilevel regression. The intraclass correlation can also be interpreted as the expected correlation between two randomly drawn units that are in the same group.
+     
+The Intra-class correlation (ICC) can be estimated by specifying a fully unconditional multilevel logistic model:
+\begin{equation} 
+\operatorname{logit}\left(p_{i j}\right)=\gamma_{00} + u_{0 j}.
+\end{equation}
+The ICC for the logistic regression model is defined as 
+\begin{equation}
+\rho=\frac{\sigma_{u0}^{2}}{\sigma_{u0}^{2}+\sigma_{e}^{2}},
+\end{equation}
+where $\sigma_{u0}^{2}$ is the variance of the random intercept in the fully unconditional model and $\sigma^{2}_e$ is the variance of the residuals on the first level.
+However, for logistic regression, there is no direct estimation of the variance of the residuals $\sigma^{2}_e$ on the first level.
+Among different procedures, 'latent variable approach' has become the most widely used procedure for computing ICC in a multilevel logistic model. In this approach, the observed binary response is considered to represent a thresholded continuous variable where we observe 0, when the value of the latent variable is below the threshold, and 1 otherwise (e.g., pass/fail on a test is a binary representation of an underlying continuous latent variable test score where the threshold is the pass mark). In a 'logit' model, the underlying latent variable has a logistic distribution. We know that the logistic distribution has variance $\frac{\pi^{2}}{3}$. We can then take this as the level 1 variance so that now both the level 1 and 2 variances are on the same scale since the level 2 variance is measured on the logistic scale [@guo2000multilevel].
+
+## Parameter estimation in multilevel logistic regression model
+    
+From previous description recall that, the number of groups in our data is $J$, and $n_j$ is the number of observations within the $j^{th}$ group. Now suppose that the number of regressors in our analysis is $p$ (including the intercept) and there are $r$ random effects where $p \geq r$.
+Then the multilevel linear regression model in Equation \@ref(eq:linear-single), for the $j^{th}$ group, can be written as:
+\begin{equation}
+\mathbf{Y}_{j}=\mathbf{X}_{j} \boldsymbol{\beta}+\mathbf{Z}_{j} \mathbf{u}_{j}+\boldsymbol{\varepsilon}_{j},
+\end{equation}
+where $\mathbf{Y}_{j}$ is an $n_{j} \times 1$ vector of responses for group $j$, 
+$\mathbf{X}_{j}$ is an $n_{j} \times p$ design matrix for the regressors in group $j$ , 
+$\boldsymbol{\beta}$ is a $p \times 1$ vector of unknown fixed effects coefficients, 
+$\mathbf{Z}_{j}$ is an $n_{j} \times r$ design matrix for the random effects of group $j$, 
+$\mathbf{u}_{j}$ is a $r \times 1$ vector of unknown random effects for group $j$ where $\mathbf{u}_{j} \sim M V N(\mathbf{0}, \mathbf{D})$,
+$\boldsymbol{\varepsilon}_{j}$ is a vector of unobserved errors of the observations in group $j$ where
+$\boldsymbol{\varepsilon}_{j}\sim M V N\left(\mathbf{0}, \mathbf{R}_{j}\right)$ and $\operatorname{Cov}\left(\mathbf{u}_{j}, \boldsymbol{\varepsilon}_{j}\right)=\mathbf{0}$.
+
+In the multilevel logistic regression model, the probability of outcome variable ${Y}_{j}$, conditional on the group-specific effects ${u}_{j}$, can be written as
+\begin{equation}
+P\left(\mathbf{Y}_{j}=1 | \mathbf{u}_{j}\right)=\frac{\exp \left(\mathbf{X}_{j} \boldsymbol{\beta}+\mathbf{Z}_{j} \mathbf{u}_{j}\right)}{1+\exp \left(\mathbf{X}_{j} \mathbf{\beta}+\mathbf{Z}_{j} \mathbf{u}_{j}\right)},
+\end{equation}
+or as
+\begin{equation}
+P\left(\mathbf{Y}_{j}=0 | \mathbf{u}_{j}\right)=\frac{1}{1+\exp \left(\mathbf{X}_{j} \boldsymbol{\beta}+\mathbf{Z}_{j} \mathbf{u}_{j}\right)}.
+\end{equation}
+We assume that responses in each group are independent after conditioning on the random effects (i.e., $\mathbf{R}_{j}=\sigma^{2} \mathbf{I} )$. Then the conditional probability of $\mathbf{Y}_{j}$ can be written as
+\begin{equation}
+f\left(\mathbf{Y}_{j} | \mathbf{u}_{j} ; \boldsymbol{\beta}\right)=\prod_{i=1}^{n_{j}} P\left(Y_{i j}=1 | \mathbf{u}_{j}\right)^{Y_{i j}} P\left(Y_{i j}=0 | \mathbf{u}_{j}\right)^{1-Y_{i j}},
+\end{equation}
+where $i$ is an index for individuals within clusters, i.e., $Y_{ij}$ is the $i^{th}$ individual within the $j^{th}$ group.
+Because the random effects are unobserved, inferences for the fixed effects $\boldsymbol{\beta}$ and the covariance matrix of the random effects $\mathbf{D}$ are estimated by integrating over the random effects, $\mathbf{u}_{j} .$ The result is the 'marginal likelihood function' which is written as
+\begin{equation}
+L(\boldsymbol{\beta}, \mathbf{D})=\prod_{j=1}^{J} \int f\left(\mathbf{y}_{j} | \mathbf{u}_{j} ; \boldsymbol{\beta}\right) r\left(\mathbf{u}_{j} ; \mathbf{D}\right) \mathrm{d} \mathbf{u}_{j},
+(\#eq:likelihood)
+\end{equation}
+where $r\left(\mathbf{u}_{j} ; \mathbf{D}\right)$ is a probability distribution of $\mathbf{u}_{j}$.
+
+So, the expression for the marginal likelihood of a multilevel model is an integral over the random effects space. The calculation involves high dimensional integrals. For a linear multilevel model, this integral can be evaluated exactly. For a generalized linear multilevel model the integral must be approximated since unlike the linear multilevel model, the likelihood does not have a closed-form solution because of the inherent non-linearity of the model [@mcneish2016estimation].
+This leaves researchers with two broad approaches to estimate the model
+(1) linearly approximate the model so that the likelihood function does have a closed-form (e.g., penalized quasi-likelihood) or (2) retain the non-linearity of the model and approximate the likelihood function (e.g., Gaussian quadrature, Laplace approximation).
+    
+The three most common techniques for estimating multilevel logistic models are briefly discussed here:
+    
+## Penalized quasi-likelihood
+
+Penalized quasi-likelihood (PQL) approximates the model by linearizing its non-linear components rather than approximating the integral of the likelihood function [@breslow1993approximate]. This can be done with a double iterative algorithm. 
+At first,  the fixed effects $(\boldsymbol{\beta})$ and random effects $\left(\mathbf{u}_{j}\right)$ are estimated (either fitting a  single-level logistic regression model or the estimates can be user specified). These initial estimated values are referred to as $\tilde{\boldsymbol{\beta}}$ and $\tilde{\mathbf{u}}_{j}$. Then, conditional on the estimates of $\boldsymbol{\beta}$ and $\mathbf{u}_{j},$ the variance components $\left(\mathbf{D} \text { and } \mathbf{R}_{j}\right)$ are estimated. Then, based on the estimates of $\mathbf{D}$ and $\mathbf{R}_{j}$, $\boldsymbol{\beta}$ and $\mathbf{u}_{j}$ are updated and the cycle continues until the differences between the estimates between two successive iterations are sufficiently small [@goldstein1996improved].
+
+A basic advantage of PQL over other computational methods for multilevel logistic models is its computational efficiency. In terms of computational speed, PQL is often the most efficient relative to other estimation methods. Therefore, PQL estimation is sometimes advocated as a starting value for other procedures and for exploratory reasons. Another advantage is that for complex models (e.g., having a large number of random effects and/or multiple hierarchies) the model may still be estimated by PQL, while other estimation methods fail. However, one big disadvantage of this method is the parameter estimated from PQL are negatively biased [@breslow1995bias].
+        
+## Adaptive Gaussian quadrature
+
+Gaussian quadrature (GQ) is a numerical approximation method that partitions the marginal likelihood function from Equation \@ref{eq:likelihood) into multiple components and then evaluates the integral by a weighted sum over the component partitions. As more quadrature points are selected, the approximation becomes more accurate. In traditional GQ, the quadrature points are centered around zero. Adaptive Gaussian quadrature (AGQ) centers the quadrature points about the mode of the marginal likelihood function which is especially advantageous when the mode is distant from zero [@lesaffre2001effect].
+
+In AGQ method, the approximate 'marginal likelihood' is calculated by
+\begin{equation} 
+L(\boldsymbol{\beta}, \mathbf{D}) \approx \prod_{j=1}^{J} \sum_{q=1}^{Q} f\left(\mathbf{Y}_{j} | \mathbf{u}_{j}=v_{q}\right) w_{q},
+\end{equation}
+where Q is the number of quadrature points (which are user selected), so the number of partitions is $Q+1$, $v_{q}$ is the $q^{th}$ evaluation point and $w_{q}$ is the related weight [@garrett2011].
+One main disadvantage of AGQ is the computational burden since the number of computations increases exponentially as the number of random effects increases.
+        
+## Laplace approximation
+
+Another approach is the Laplace approximation. The goal of the Laplace approximation is to provide an approximation for the marginal likelihood function so that integration can be performed. The Laplace approximation uses Taylor series expansions to approximate the integrand rather than computing the integral with numerical methods as with AGQ so that the integral will have a closed-form solution.
+        
+The marginal likelihood function in Equation \@ref(eq:likelihood) can alternatively been written as 
+\begin{equation} 
+L(\boldsymbol{\beta}, \mathbf{D})=(2 \pi)^{-k / 2}|\mathbf{D}|^{-1 / 2} \int \exp \left[h\left(\mathbf{u}_{j}\right)\right] \mathrm{d} \mathbf{u}_{j},
+\end{equation}
+ where
+\begin{equation} 
+h\left(\mathbf{u}_{j}\right)=\log f\left(\mathbf{Y}_{j} | \mathbf{u}_{j} ; \boldsymbol{\beta}\right)-\frac{1}{2}\left(\mathbf{u}_{j}^{\mathrm{T}} \mathbf{D}^{-1} \mathbf{u}_{j}\right).
+\end{equation}
+A second-order Taylor series expansion is applied to $\exp \left[h\left(\mathbf{u}_{j}\right)\right]$ about the mode of $\mathbf{u}_{j}$ (denoted $\mathbf{u}_{j} )$ such that
+\begin{equation} 
+\exp \left[h\left(\mathbf{u}_{j}\right)\right]=\exp \left[h\left(\widetilde{\mathbf{u}}_{j}\right)+\frac{1}{2}\left(\mathbf{u}_{j}-\widetilde{\mathbf{u}}_{j}\right)^{\mathrm{T}} \frac{\partial^{2} h}{\partial \mathbf{u}_{j} \partial \mathbf{u}_{j}^{\mathrm{T}}}\left(\mathbf{u}_{j}-\widetilde{\mathbf{u}}_{j}\right)+K_{j}\right],
+\end{equation}
+where $K$  is the remainder which is ignored because it approaches zero as the group size increases. After expansion, the integrand has a closed-form and the integral can be evaluated [@raudenbush2000maximum].
+Laplace method yields more accurate fixed and variance component estimates as sample sizes increase, particularly compared to PQL methods [@breslow1995bias].
+Using a single point in AGQ method is equivalent to the Laplace approximation. The number of points greater than 1 produce greater accuracy in the evaluation of the likelihood. However, the larger the number of points, the more computationally intensive (and restrictive) is the estimation procedure.
+        
+        
+## Confidence interval of the estimates
+        
+### Wald-type confidence interval
+        
+The $(1-\alpha) \cdot 100\%$ Wald-type confidence interval is found as
+\begin{equation}
+( \hat{\theta} - z_{\alpha /2} \cdot SE( \hat{\theta}),  \hat{\theta} + z_{\alpha /2} \cdot SE( \hat{\theta}) ),   
+\end{equation}
+where $\hat{\theta}$ is the estimate of the parameter $\theta$, and $SE( \hat{\theta}$ is the standard error of the estimate $\hat{\theta}$. The $z_{\alpha /2}$ is the $(1-\alpha/2) \cdot 100\%$ percentile of the standard normal distribution, which is the sampling distribution of the Wald statistic in repeated samples, when the sample size is large.
+        
+        
+### Profile likelihood confidence interval
+
+The main idea of profile likelihood  is to invert a likelihood-ratio test to obtain a CI for the parameter in question [@venzon1988]. Consider a statistical model with parameters $\theta$ and $\delta$ where $\theta$ is the parameter of interest and $\delta$ is the (vector of) additional parameter(s) in the model. We denote the likelihood function by $L(\theta, \delta)$ , and the maximum likelihood (ML) estimates by $\left(\theta^{*}, \delta^{*}\right)$.
+For the hypothesis $\mathrm{H}_{0} : \theta=\theta_{0}$ (where $\theta_{0}$ is a fixed value), the likelihood ratio test statistic $\left(G^{2}\right)$  equals the drop in 2 $\ln L$ between the full model and the reduced model with $\theta$ fixed at $\theta_{0},$ i.e.,
+
+\begin{equation}
+G^{2}=2\left(\ln L\left(\theta^{*}, \delta^{*}\right)-\ln L\left(\theta_{0}, \delta_{0}^{*}\right)\right),
+\end{equation}
+        
+where $\delta_{0} *$ is the ML estimate of the reduced model.
+        
+Alternatively, we may express the test statistic $G^2$ in terms of the profile likelihood function $L_{1}$ for the parameter $\theta$ which is obtained from the usual likelihood function by maximizing over the parameter $\delta,$ i.e., $L_{1}(\theta)=\max _{\delta} L(\theta, \delta)$. Then we have
+
+\begin{equation}
+ G^{2}=2\left(\ln L_{1}\left(\theta^{*}\right)-\ln L_{1}\left(\theta_{0}\right)\right).  
+\end{equation}
+
+A 95$\%$ CI for $\theta$ consists of those values of $\theta_{0}$ for which the test is non-significant at significance level $0.05 ;$ this is the case when $G^{2}$ does not exceed $3.84$ ($95\%$-percentile of the $\chi^{2}(1)$ distribution). Thus, the Confidence Interval consists of the $\theta_{0}$-values for which 
+$G^2 = 2\left(\ln L_{1}\left(\theta^{*}\right)-\ln L_{1}\left(\theta_{0}\right)\right) \leq 3.84$,
+or, $\ln L_{1}\left(\theta_{0}\right) \geq \ln L\left(\theta^{*}, \delta^{*}\right)-1.92$.
+For a confidence interval with coverage $(1-\alpha) * 100 \%$ , use instead the $(1-\alpha)$-percentile of the $\chi^{2}(1)$ distribution.
+       
+        
+Computation of a profile likelihood confidence interval follows some steps. For simplicity, we consider only the lower bound of the CI (the upper bound is similar) and assume the profile likelihood function to be an increasing function to the left of its maximum. As a start, compute the ML estimates $\left(\theta^*, \delta^{*}\right)$ and the corresponding log-likelihood value. Then proceed by the following steps:
+
+1. Compute a 'reasonable' lower bound $\theta^{\prime}$ for the lower confidence limit (e.g., $\theta^{*}-5 \operatorname{SE}\left(\theta^{*}\right),$ or 0.0001 if $\theta$-values are restricted to be $>$ 0 ).
+        
+2. Define a grid of values ranging from $\theta^{\prime}$ to $\theta^{*}$ (e.g., 100 equidistant points).
+        
+3. For each grid value $\theta_{i},$ compute the profile log-likelihood value $\ln L_{1}\left(\theta_{i}\right)$ by maximizing the $\ln L\left(\theta_{i}, \delta\right)$ over $\delta$-values (a standard analysis allowing $\theta$ to be fixed at $\theta_{i}$ may apply).
+        
+4. Take as the lower bound $\left(\theta_{\mathrm{L}}\right)$ of the 95$\%$ CI the smallest $\theta_{i}$ -value for which it holds that $\ln L_{1}\left(\theta_{i}\right) \geq \ln L\left(\theta^{*}, \delta^{*}\right)-1.92$.
+        
+5. If necessary, refine or extend the grid of values around $\theta_{\mathrm{L}}$ to obtain greater accuracy.
+    
+For repeated computations, one may replace the crude search over a grid of values by a systematic search procedure (e.g., bisection of the interval from $\theta^{\prime}$ to $\theta^{*} )$.
+
+        
+

@@ -1,0 +1,95 @@
+---
+author: 'Rasel Biswas'
+date: 'August 2019'
+institution: 'University of Dhaka'
+division: 'Institute of Statistical Research and Training'
+advisor: 'Noor Jahan Akter'
+# If you have more two advisors, un-silence line 7
+#altadvisor: 'Your Other Advisor'
+department: 'Applied Statistics'
+degree: 'Bachelor of Science, B.S.(Hons)'
+title: 'Impact of Sample Sizes on the Accuracy of Estimates for a Two-level Logistic Regression Model'
+knit: "bookdown::render_book"
+site: bookdown::bookdown_site
+output: 
+#  thesisdown::thesis_pdf: default
+  thesisdown::thesis_gitbook: default
+#  thesisdown::thesis_word: default
+#  thesisdown::thesis_epub: default
+abstract: |
+  In a multilevel framework an important problem is calculating an adequate sample size that generates accurate estimates. Several researches have investigated the behavior of estimates in finite samples, particularly for continuous dependent variables. On the other hand, binary response multilevel models have been investigated less widely. In this research we investigate the sample behavior of estimates in a binary response multilevel model. Particularly, we analyze the influence of different factors on the accuracy of estimates and their profile likelihood confidence intervals for a 2-level logistic regression model, through a Monte Carlo simulation study. We investigate the hypothesis of: (a) different level-1 sample sizes; (b) different level-2 sample sizes; (c) different intra-class correlation coefficients. We investigate the bias of estimates by relative bias and, through a non-coverage indicator, the accuracy of the confidence interval. In all instances we have examined, the point estimates are unbiased (even with very small sample sizes), while the variance components are always underestimated. Despite some exceptions for the variance components, the profile likelihood confidence interval performs very well in all simulated conditions.
+# 
+# Note that a tab is needed on the line after the `|`.
+# 
+acknowledgements: |
+  First of all, I am grateful to the one true God for the good health and wellbeing that were necessary to complete this project. I wish to express my sincere gratitude to my project supervisor Ms. Noor Jahan Akter. I would also like to thank my friends and classmates for offering me advice, and supporting me through this entire process. Special thanks to my friends and brothers from Fazlul Huq Muslim Hall. Without their help and support, I could not have made it this far. Finally, I must express my very profound gratitude to my parents for providing me with unfailing support throughout my years of study. Thank you.
+declaration: |
+  I, Md. Rasel Biswas hereby formally declare that I have written the submitted Master‘s thesis entirely by myself without anyone else’s assistance. Where I have drawn on literature or other sources, either in direct quotes, or in paraphrasing such material, I have referenced the original author or authors and the source in which it appeared.
+  \hfill\break
+  \hfill\break
+  \hfill\break
+  \begin{flushleft}
+  \rule{0.3\textwidth}{0.4pt}
+  \end{flushleft}
+  \begin{flushleft}
+    Md. Rasel Biswas\\
+    Dhaka, August 2019
+  \end{flushleft}
+dedication: |
+  To my parents.
+# Specify the location of the bibliography below
+bibliography: bib/thesis.bib
+# Download your specific csl file and refer to it in the line below.
+csl: csl/apa.csl
+lot: true # create list of tables
+lof: true # create list of figures
+# If you prefer blank lines between paragraphs, un-silence lines  50-51 (this requires package tikz)
+header-includes:
+#- \usepackage{tikz}
+# Rasel added the following packages::::
+- \linespread{1.3}
+- \usepackage{hyperref}
+- \hypersetup{colorlinks = true, linkcolor = blue, anchorcolor = blue, citecolor = blue, filecolor = blue, urlcolor = blue}
+- \usepackage{placeins}
+---
+
+<!--
+Above is the YAML (YAML Ain't Markup Language) header that includes a lot of metadata used to produce the document.  Be careful with spacing in this header!
+
+If you'd prefer to not include a Dedication, for example, simply delete the section entirely, or silence (add #) them. 
+
+If you have other LaTeX packages you would like to include, delete the # before header-includes and list the packages after hyphens on new lines.
+
+If you'd like to include a comment that won't be produced in your resulting file enclose it in a block like this.
+
+If you receive a duplicate label error after knitting, make sure to delete the index.Rmd file and then knit again.
+-->
+
+```{r include_packages, include = FALSE}
+# This chunk ensures that the thesisdown package is
+# installed and loaded. This thesisdown package includes
+# the template files for the thesis.
+if(!require(devtools))
+  install.packages("devtools", repos = "http://cran.rstudio.com")
+if(!require(thesisdown))
+  devtools::install_github("ismayc/thesisdown")
+library(thesisdown)
+```
+
+<!-- On ordering the chapter files:
+There are two options:
+1. Name your chapter files in the order in which you want them to appear (e.g., 01-Inro, 02-Data, 03-Conclusions). 
+2. Otherwise, you can specify the order in which they appear in the _bookdown.yml (for PDF only).
+
+Do not include 00(two-hyphens)prelim.Rmd and 00-abstract.Rmd in the YAML file--they are handled in the YAML above differently for the PDF version.
+-->
+
+<!-- The {.unnumbered} option here means that the introduction will be "Chapter 0." You can also use {-} for no numbers
+on chapters.
+-->
+
+# Preface {-}
+This is Rasel Biswas's final year project dissertation for the B.S. (honors) degree at the University of Dhaka. The gitbook version can be read via the following link: https://rasel.rbind.io/project450
+
+
+

@@ -1,0 +1,20 @@
+# Conclusion {#conclusion}
+
+In this study, we perform Monte Carlo simulation studies to investigate the sample behavior of estimates in a binary response multilevel model using the Laplace approximation estimation procedure. Particularly, we analyze the influence of different factors (different number of groups, different group sizes, different intra-class correlation coefficients) on the accuracy of parameter estimates (fixed effects and variance components) and their profile likelihood confidence intervals.
+
+Despite the limitations of simulation studies, our findings can offer some suggestions for sample size selection in multilevel logistic regression. With a group of 50 and group size 30, we found that the non-coverage rates for fixed effect parameters range from $4.7\%$ to $7.3\%$ and for level-2 variance components from $5.7\%$ to $7.8\%$. This is clearly different from the nominal $5\%$, however, in practice probably acceptable [@maas2005sufficient]. Besides, with this sample size, the model convergence rate is almost $100\%$, and the bias of variance components are less $6\%$. Thus, based on our findings, we recommend a minimum of 50 groups with at least 30 units per group.
+
+In our study, we assumed group level residuals are normally distributed. This may not be the case always.  Our results are comparable with the simulation results reported by @maas2005sufficient, @moineddin2007simulation, and @paccagnella2011sample, when only those conditions are considered that are similar to the conditions in our simulations.
+The results of some simulation studies, reviewed in this project, may appear somewhat inconsistent. However, this is probably the result of using different simulation designs and different simulated conditions.
+
+The main findings from this research can be summarized as follows:
+
+- The estimates of the regression coefficients are always unbiased, even with small sample sizes, except some cases on level-2 variable coefficients.
+
+- The variance components are always underestimated, even with 100 groups and 50 individuals. However, the bias decreases with the increase in number of groups, and with number of groups 50 and group size 50 this bias is less than $5\%$.
+
+- The mean non-coverage rate for profile likelihood confidence interval is $6.39\%$, and non-coverage rates are more close to $6\%$, than the nominal value $5\%$.
+
+- In some cases, profile likelihood confidence interval performs poorly for the variance components (e.g., the three cases for 100 groups with 5 individuals per group). This suggests, there might be other factors that influence the coverage rate of profile likelihood confidence interval.
+
+
